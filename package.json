@@ -1,0 +1,14 @@
+{
+  "name": "gulp-vinyl-reduce",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "axdg <axdg@dfant.asia>",
+  "license": "MIT",
+  "dependencies": {
+    "vinyl": "^1.1.0"
+  }
+}
