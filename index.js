@@ -1,79 +1,67 @@
-var through = require('through2');
-var gutil = require('gulp-util');
-var PluginError = gutil.PluginError;
-var File = require('vinyl');
+var stream = require('readable-stream');
+var PluginError = require('gulp-util').PluginError;
 
 const PLUGIN_NAME = 'gulp-use';
 
-// exported plugin
-module.exports.sync = function(fn) {
-  if ('function' != typeof fn) {
-    throw new PluginError(PLUGIN_NAME, 'A single function argument is required!');
-  }
-
-  return through.obj(function(file, enc, cb) {
-    try {
-      var ret = fn(file);
-    } catch(err) {
-      throw new PluginError(PLUGIN_NAME, err);
+/**
+ * use an async Vinyl transform function,
+ * and optional async flush function to
+ * create a gulp plugin.
+ *
+ * @param {String} [name] - not implemented..
+ * @param {Function} transform
+ * @param {Function} [flush]
+ * @return {stream.Transform}
+ */
+function use(/**name,*/ transform, flush) {
+  return new stream.Transform({
+    objectMode: true,
+    transform: function(chunk, encoding, next) {
+      transform.call(this, chunk, next);
+    },
+    flush: function(done) {
+      if(!flush) return done();
+      flush.call(this, done)
     }
-
-    if(ret) {
-      if(Array.isArray(ret)) {
-        var len = res.length;
-        for(var i = 0; i < len; i++) {
-          if(!File.isVinyl(ret[i])) {
-            this.emit(new PluginError(PLUGIN_NAME, 'A Vinyl, or an array of Vinyls must be returned!'))
-          }
-          ret.forEach(Array.prototype.push.bind(this));
-        }
-      } else {
-        if(!File.isVinyl(ret)) {
-          this.emit(new PluginError(PLUGIN_NAME, 'A Vinyl, or an array of Vinyls must be returned!'))
-        }
-      }
-      return cb();
-    }
-
-    if(ret == undefined) {
-      this.push(file);
-    }
-
-    cb();
   });
 }
 
-// Use an asyncronous function (return a promise or an array of promises))
-module.exports.async = function(fn) {
-  if('function' != typeof fn) {
-    throw new PluginError(PLUGIN_NAME, 'A single function argument is required!');
-  }
-
-  return through.obj(function(file, enc, cb) {
-    var ret = fn(file)
-
-    var self = this
-
-    if(!Array.isArray(ret)) {
-      ret = [ret]
-    }
-
-    Promise.all(ret).then(function(files) {
-      var len = ret.length
-      for(var i = 0; i < len; i++) {
-        if(!File.isVinyl(files[i])) {
-          self.emit('error', new PluginError(PLUGIN_NAME, 'Promises must resolve vinyl files!'))
-          return cb()
-        }
+/**
+ * use a sync Vinyl transform function,
+ * and optional sync flush function to
+ * create a gulp plugin. Primarily
+ * implemented to simply error handling
+ * for very simple transforms.
+ *
+ * @param {String} [name] - not implemented..
+ * @param {Function} transform
+ * @param {Function} [flush]
+ * @return {stream.Transform}
+ */
+function sync(/**name,*/ transform, flush) {
+  return new stream.Transform({
+    objectMode: true,
+    transform: function(chunk, encoding, next) {
+      try {
+        var file = transform.call(this, chunk);
+      } catch(err) {
+        next(new PluginError(name, err));
       }
-      files.forEach(function(file) {
-        self.push(file)
-      })
-      cb()
-    }, function(reason) {
-      self.emit('error', new PluginError(PLUGIN_NAME, reason))
-      cb()
-    })
-    return
+      if(file) this.push(file);
+      next();
+    },
+    flush: function(done) {
+      if(!flush) return done();
+      try {
+        var file = flush.call(this);
+      } catch(err) {
+        done(new PluginError(name, this));
+      }
+      if(file) this.push(file);
+      done();
+    }
   })
 }
+
+module.exports = use;
+module.exports.sync = sync;

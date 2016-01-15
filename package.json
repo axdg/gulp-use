@@ -10,7 +10,9 @@
   "license": "MIT",
   "dependencies": {
     "gulp-util": "^3.0.7",
-    "through2": "^2.0.0",
+    "readable-stream": "^2.0.5"
+  },
+  "devDependencies": {
     "vinyl": "^1.1.0"
   }
 }
