@@ -1,28 +1,33 @@
 var stream = require('readable-stream');
 var PluginError = require('gulp-util').PluginError;
 
-const PLUGIN_NAME = 'gulp-use';
+/**
+ * Used where no tranform is provided.
+ *
+ * @api Private
+ */
+function noop(chunk, encoding, next) {
+  next(null, chunk);
+}
 
 /**
  * use an async Vinyl transform function,
  * and optional async flush function to
  * create a gulp plugin.
  *
- * @param {String} [name] - not implemented..
  * @param {Function} transform
  * @param {Function} [flush]
- * @return {stream.Transform}
+ * @return {stream.Transform} - transform stream in object mode.
  */
-function use(/**name,*/ transform, flush) {
+function use(transform, flush) {
   return new stream.Transform({
     objectMode: true,
-    transform: function(chunk, encoding, next) {
+    transform: transform ? function(chunk, encoding, next) {
       transform.call(this, chunk, next);
-    },
-    flush: function(done) {
-      if(!flush) return done();
+    } : noop,
+    flush: flush ? function(done) {
       flush.call(this, done)
-    }
+    } : null
   });
 }
 
@@ -30,28 +35,35 @@ function use(/**name,*/ transform, flush) {
  * use a sync Vinyl transform function,
  * and optional sync flush function to
  * create a gulp plugin. Primarily
- * implemented to simply error handling
- * for very simple transforms.
+ * implemented to simplify error handling
+ * in simple transforms
  *
- * @param {String} [name] - not implemented..
  * @param {Function} transform
  * @param {Function} [flush]
- * @return {stream.Transform}
+ * @param {String} [name] - optional `PLUGIN_NAME` on catch.
+ * @return {stream.Transform} - transform stream in object mode.
  */
-function sync(/**name,*/ transform, flush) {
+function sync(transform, flush, name) {
+
+  if(typeof flush === 'string') {
+    name = flush;
+    flush = null;
+  }
+
+  name = name || 'gulp-use';
+
   return new stream.Transform({
     objectMode: true,
-    transform: function(chunk, encoding, next) {
+    transform: transform ? function(chunk, encoding, next) {
       try {
-        var file = transform.call(this, chunk);
+        var file = transform ? transform.call(this, chunk) : chunk;
       } catch(err) {
         next(new PluginError(name, err));
       }
       if(file) this.push(file);
       next();
-    },
-    flush: function(done) {
-      if(!flush) return done();
+    } : noop,
+    flush: flush ? function(done) {
       try {
         var file = flush.call(this);
       } catch(err) {
@@ -59,7 +71,7 @@ function sync(/**name,*/ transform, flush) {
       }
       if(file) this.push(file);
       done();
-    }
+    } : null
   })
 }
 
