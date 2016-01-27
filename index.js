@@ -22,7 +22,15 @@ function sync(transform, flush, name) {
     flush = null;
   }
 
-  name = name || 'gulp-use';
+  name = name || PLUGIN_NAME;
+
+  if (transform && 'function' !== typeof transform) {
+    throw new PluginError(PLUGIN_NAME, 'transform must be a function');
+  }
+
+  if (flush && 'function' !== typeof flush) {
+    throw new PluginError(PLUGIN_NAME, 'flush must be a function');
+  }
 
   return new stream.Transform({
     objectMode: true,
@@ -30,16 +38,18 @@ function sync(transform, flush, name) {
       try {
         var file = transform ? transform.call(this, chunk) : chunk;
       } catch(err) {
-        next(new PluginError(name, err));
+        return next(new PluginError(name, err));
       }
-      if(file) this.push(file);
+      if(file) {
+        this.push(file);
+      }
       next();
     } : noop,
     flush: flush ? function(done) {
       try {
         var file = flush.call(this);
       } catch(err) {
-        done(new PluginError(name, this));
+        done(new PluginError(name, err));
       }
       if(file) this.push(file);
       done();
