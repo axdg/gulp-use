@@ -118,7 +118,7 @@ describe('use', function() {
           throw new Error(String(file.contents));
       })
 
-      var s = producer([file])
+      producer([file])
         .pipe(through)
         .pipe(consumer([]))
 
