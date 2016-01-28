@@ -1,3 +1,5 @@
+'use strict';
+
 var use = require('./');
 var stream = require('readable-stream');
 var File = require('vinyl');
@@ -6,15 +8,15 @@ var expect = require('expect');
 /**
  * Some fixture vinyl files
  */
- var files = [];
- for(var i = 0; i < 10; i++) {
+var files = [];
+for (let i = 0; i < 10; i++) {
   files.push(new File({
     cwd: '/',
     base: '/test/',
     path: '/test/file_' + i + '.file',
-    contents: new Buffer('' + i),
+    contents: new Buffer(i.toString()),
   }));
- }
+}
 
  /**
  * Some private utility functions for testing the module
@@ -30,17 +32,17 @@ var expect = require('expect');
  * @return {stream.Readable} readable stream
  * @api private
  */
-function producer (arr) {
-
-  if(!arr) {
+function producer(arr) {
+  var input;
+  if (!arr) {
     arr = [];
   }
 
   // neat way to clone an array
-  var input = arr.slice(0);
+  input = arr.slice(0);
 
   // clone vinyls so-as not to mutate
-  input.forEach(function(c, i) {
+  input.forEach(function (c, i) {
     input[i] = c.clone();
   });
 
@@ -67,7 +69,7 @@ function producer (arr) {
  * @param {Array} arr
  * @return {stream.Writable} writeable
  */
-function consumer (arr) {
+function consumer(arr) {
   return new stream.Writable({
     objectMode: true,
     write: function (file, _, next) {
@@ -77,33 +79,33 @@ function consumer (arr) {
   });
 }
 
-describe('use', function() {
-  describe('#sync()', function() {
-    it('should throw given an invalid transform arg', function() {
-      expect(function() {
+describe('use', function () {
+  describe('#sync()', function () {
+    it('should throw given an invalid transform arg', function () {
+      expect(function () {
         return use('string');
       }).toThrow();
     });
 
-    it('should throw given an invalid flush arg', function() {
-      expect(function() {
-        return use(null, string);
+    it('should throw given an invalid flush arg', function () {
+      expect(function () {
+        return use(null, {});
       }).toThrow();
     });
 
-    it('should return an instance of stream.Duplex', function() {
+    it('should return an instance of stream.Duplex', function () {
       var through = use();
       expect(through).toBeA(stream.Duplex);
       expect(through).toBeA(stream.Transform);
     });
 
-    it('should return a noop stream when invoked with no args', function(complete) {
+    it('should return a noop stream when invoked with no args', function (complete) {
       var output = [];
       var file = new File({ contents: new Buffer('noop') });
 
       var s = producer([file])
         .pipe(use())
-        .pipe(consumer(output))
+        .pipe(consumer(output));
 
       s.on('finish', function () {
         expect(String(output[0].contents)).toBe('noop');
@@ -111,20 +113,20 @@ describe('use', function() {
       });
     });
 
-    it('should re-emit errors thrown in the provided transform', function(complete) {
-      var file = new File({ contents: new Buffer('uh-oh!') });
+    it('should re-emit errors thrown in the provided transform', function (complete) {
+      var vinyl = new File({ contents: new Buffer('uh-oh!') });
 
-      var through = use(function(file) {
-          throw new Error(String(file.contents));
-      })
+      var through = use(function (file) {
+        throw new Error(String(file.contents));
+      });
 
-      producer([file])
+      producer([vinyl])
         .pipe(through)
-        .pipe(consumer([]))
+        .pipe(consumer([]));
 
-      through.on('error', function(err) {
+      through.on('error', function (err) {
         expect(err).toBeA(Error);
-        expect(err.message).toEqual('uh-oh!')
+        expect(err.message).toEqual('uh-oh!');
         complete();
       });
     });
@@ -134,7 +136,7 @@ describe('use', function() {
      * The streams created below are the primary use
      * case for this module.
      */
-    it('could be used to filter vinyls in the pipeline', function(complete) {
+    it('could be used to filter vinyls in the pipeline', function (complete) {
       var output = [];
       var s = producer(files)
         .pipe(use(threes))
@@ -143,26 +145,26 @@ describe('use', function() {
       // re-emit files evenly divisible by three
       var count = 0;
       function threes(file) {
-        if(count && !(count % 3)) {
-          this.push(file)
+        if (count && !(count % 3)) {
+          this.push(file);
         }
         count++;
       }
 
       // getting a bit wierd - unreadable
-      s.on('finish', function() {
+      s.on('finish', function () {
         expect(output.length).toBe(3);
-        output.forEach(function(file, i) {
+        output.forEach(function (file, i) {
           expect(+file.contents).toBe((i + 1) * 3);
-        })
+        });
         complete();
       });
     });
 
-    it('could be used to emit multiple version of a vinyl file', function(complete) {
+    it('could be used to emit multiple `splits` of a file', function (complete) {
       var output = [];
       var s = producer(files)
-        .pipe(use(function(file) {
+        .pipe(use(function (file) {
           this.push(prepend(file, 'first:'));
           this.push(prepend(file, 'second:'));
           return file;
@@ -173,40 +175,64 @@ describe('use', function() {
       // text prepended to file.contents,
       // doesn't mutate the original
       function prepend(file, text) {
-        var file = file.clone();
-        file.contents = new Buffer(text + String(file.contents));
-        return file;
+        var vinyl = file.clone();
+        vinyl.contents = new Buffer(text + String(file.contents));
+        return vinyl;
       }
 
-      s.on('finish', function() {
+      s.on('finish', function () {
         expect(output.length).toBe(30);
         complete();
       });
     });
 
-    it('could be used to implement a vinyl `reducer`');
+    it('could be used to implement a vinyl `reducer`', function (complete) {
+      var output = [];
+      var accumulated = [];
+      var s = producer(files)
+        .pipe(use(transform, flush))
+        .pipe(consumer(output));
+
+      s.on('finish', function () {
+        expect(output.length).toBe(1);
+        expect(String(output[0].contents)).toBe('0123456789');
+        complete();
+      });
+
+      function transform(file) {
+        accumulated.push(file.contents);
+      }
+
+      function flush() {
+        var file = new File({
+          path: './accumulated.txt',
+          contents: Buffer.concat(accumulated),
+        });
+        this.push(file);
+      }
+    });
   });
 
-  describe('#async()', function() {
-    it('should throw given an invalid transform arg', function() {
-      expect(function() {
+  describe('#async()', function () {
+    it('should throw given an invalid transform arg', function () {
+      expect(function () {
         return use.async('string');
       }).toThrow();
     });
 
-    it('should throw given an invalid flush arg', function() {
-      expect(function() {
-        return use.async(null, string);
+    it('should throw given an invalid flush arg', function () {
+      expect(function () {
+        return use.async(null, 'string');
       }).toThrow();
     });
 
-    it('should return an instance of stream.Duplex', function() {
+    it('should return an instance of stream.Duplex', function () {
       var through = use.async();
       expect(through).toBeA(stream.Duplex);
       expect(through).toBeA(stream.Transform);
     });
 
-    it('should return a noop stream when invoked with no args', function(complete) {
+    it('should return a noop stream when invoked with no args', function (complete) {
       var output = [];
       var file = new File({ contents: new Buffer('noop') });
 
@@ -220,55 +246,55 @@ describe('use', function() {
       });
     });
 
-    it('should return a stream.Transform given a transform function', function(complete) {
+    it('should return a stream.Transform given a transform function', function (complete) {
       var output = [];
 
       var s = producer([new File({ contents: new Buffer('test') })])
-        .pipe(use.async(function(file, next) {
+        .pipe(use.async(function (file, next) {
           file.contents = new Buffer(String(file.contents) + ':append');
           next(null, file);
         }))
         .pipe(consumer(output));
 
-      s.on('finish', function() {
+      s.on('finish', function () {
         expect(String(output[0].contents)).toBe('test:append');
         complete();
       });
     });
 
-    it('should return a stream.Transform given a flush function', function(complete) {
+    it('should return a stream.Transform given a flush function', function (complete) {
       var output = [];
       var s = producer()
-        .pipe(use.async(null, function(done) {
+        .pipe(use.async(null, function (done) {
           this.push(new File({ contents: new Buffer('flushed') }));
           done();
         }))
         .pipe(consumer(output));
 
-      s.on('finish', function() {
+      s.on('finish', function () {
         expect(String(output[0].contents)).toBe('flushed');
         complete();
       });
     });
 
-    it('should return a stream.Transform given both transform and flush', function(complete) {
+    it('should return a stream.Transform given both transform and flush', function (complete) {
       var output = [];
       var s = producer([new File({ contents: new Buffer('test') })])
-        .pipe(use.async(function(file, next) {
-          file.contents = new Buffer('prepend:' + String(file.contents))
+        .pipe(use.async(function (file, next) {
+          file.contents = new Buffer('prepend:' + String(file.contents));
           next(null, file);
         },
-        function(done) {
+        function (done) {
           this.push(new File({ contents: new Buffer('flushed') }));
           done();
         }))
         .pipe(consumer(output));
 
-      s.on('finish', function() {
+      s.on('finish', function () {
         expect(String(output[0].contents)).toBe('prepend:test');
         expect(String(output[1].contents)).toBe('flushed');
         complete();
       });
-    })
+    });
   });
 });

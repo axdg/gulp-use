@@ -1,10 +1,10 @@
 var stream = require('readable-stream');
 var PluginError = require('gulp-util').PluginError;
 
-const PLUGIN_NAME = 'gulp-use'
+const PLUGIN_NAME = 'gulp-use';
 
 /**
- * use a sync Vinyl transform function,
+ * use a sync vinyl transform function,
  * and optional sync flush function to
  * create a gulp plugin. Primarily
  * implemented to simplify error handling
@@ -16,49 +16,50 @@ const PLUGIN_NAME = 'gulp-use'
  * @return {stream.Transform} - transform stream in object mode.
  */
 function sync(transform, flush, name) {
-
-  if(typeof flush === 'string') {
+  if (typeof flush === 'string') {
     name = flush;
     flush = null;
   }
 
   name = name || PLUGIN_NAME;
 
-  if (transform && 'function' !== typeof transform) {
+  if (transform && typeof transform !== 'function') {
     throw new PluginError(PLUGIN_NAME, 'transform must be a function');
   }
 
-  if (flush && 'function' !== typeof flush) {
+  if (flush && typeof flush !== 'function') {
     throw new PluginError(PLUGIN_NAME, 'flush must be a function');
   }
 
   return new stream.Transform({
     objectMode: true,
-    transform: transform ? function(chunk, encoding, next) {
+    transform: transform ? function (chunk, encoding, next) {
+      var file;
       try {
-        var file = transform ? transform.call(this, chunk) : chunk;
-      } catch(err) {
+        file = transform ? transform.call(this, chunk) : chunk;
+      } catch (err) {
         return next(new PluginError(name, err));
       }
-      if(file) {
+      if (file) {
         this.push(file);
       }
       next();
     } : noop,
-    flush: flush ? function(done) {
+    flush: flush ? function (done) {
+      var file;
       try {
-        var file = flush.call(this);
-      } catch(err) {
+        file = flush.call(this);
+      } catch (err) {
         done(new PluginError(name, err));
       }
-      if(file) this.push(file);
+      if (file) this.push(file);
       done();
-    } : null
-  })
+    } : null,
+  });
 }
 
 /**
- * use an async Vinyl transform function,
+ * use an async vinyl transform function,
  * and optional async flush function to
  * create a gulp plugin.
  *
@@ -67,23 +68,22 @@ function sync(transform, flush, name) {
  * @return {stream.Transform} - transform stream in object mode.
  */
 function async(transform, flush) {
-
-  if (transform && 'function' !== typeof transform) {
+  if (transform && typeof transform !== 'function') {
     throw new PluginError(PLUGIN_NAME, 'transform must be a function');
   }
 
-  if (flush && 'function' !== typeof flush) {
+  if (flush && typeof flush !== 'function') {
     throw new PluginError(PLUGIN_NAME, 'flush must be a function');
   }
 
   return new stream.Transform({
     objectMode: true,
-    transform: transform ? function(chunk, encoding, next) {
+    transform: transform ? function (chunk, encoding, next) {
       transform.call(this, chunk, next);
     } : noop,
-    flush: flush ? function(done) {
-      flush.call(this, done)
-    } : null
+    flush: flush ? function (done) {
+      flush.call(this, done);
+    } : null,
   });
 }
 

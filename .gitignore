@@ -1,4 +1,6 @@
 .DS_Store
-node_modules
 gulpfile.js
-./coverage
+node_modules
+fasta
+coverage
+build
