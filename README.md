@@ -112,7 +112,7 @@ The same as syncronous version, except that it is passed `done`, which is used t
 
 ## Examples
 
-Some examples of use cases for `gulp-use`
+Some random examples of use cases for `gulp-use`:
 
 ### Splitting fasta files
 
@@ -188,4 +188,4 @@ gulp.task('build:posts', function () {
 ```
 ## License
 
-MIT © 2016 axdg <axdg@dfant.asia>
+MIT © 2016 axdg (<axdg@dfant.asia>)
