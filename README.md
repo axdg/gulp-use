@@ -1,10 +1,10 @@
 # gulp-use
 
-> Tap into the gulp pipeline and use vanilla functions to for all your esoteric vinyl transformation needs
+> Tap into the gulp pipeline for all of your esoteric vinyl transformation needs
 
 [![Build Status](https://travis-ci.org/axdg/gulp-use.svg?branch=master)](https://travis-ci.org/axdg/gulp-use) [![Circle CI](https://circleci.com/gh/axdg/gulp-use/tree/master.svg?style=shield)](https://circleci.com/gh/axdg/gulp-use/tree/master) [![Coverage Status](https://coveralls.io/repos/github/axdg/gulp-use/badge.svg?branch=master)](https://coveralls.io/github/axdg/gulp-use?branch=master)
 
-There are plenty of [high](https://github.com/search?q=%40sindresorhus+gulp-) [quality](https://github.com/search?utf8=%E2%9C%93&q=%40contra+gulp-&type=Repositories&ref=searchresults) gulp plugins for performing the common file transformations that one might need from their build system. For the less common transformations, or those that are super specific specific to your needs, you can use 'gulp-use' to tap into the stream and perform file transformations. 
+There are plenty of [high](https://github.com/search?q=%40sindresorhus+gulp-) [quality](https://github.com/search?utf8=%E2%9C%93&q=%40contra+gulp-&type=Repositories&ref=searchresults) gulp plugins for performing the common file transformations that one might need from their build system. For the less common transformations, or those that are specific to your needs, you can use 'gulp-use' to tap into the stream and perform file transformations. 
 
 The typical use case for this module is to map over the stream, but it also comes in very handy when you need to implement some sort of assymetric flow in the pipeline. Such as where a single file is split into multiple files, or multiple files (or their properties) are condensed into a single file - take a look at the examples.
 

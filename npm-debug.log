@@ -1,33 +1,101 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/local/bin/node',
-1 verbose cli   '/usr/local/bin/npm',
-1 verbose cli   'version',
-1 verbose cli   '0.0.3' ]
+1 verbose cli [ '/usr/local/bin/node', '/usr/local/bin/npm', 'publish' ]
 2 info using npm@2.14.3
 3 info using node@v4.1.0
-4 info git [ 'status', '--porcelain' ]
-5 verbose stack Error: Git working directory not clean.
-5 verbose stack M  README.md
-5 verbose stack AD npm-debug.log
-5 verbose stack M  test.js
-5 verbose stack     at /usr/local/lib/node_modules/npm/lib/version.js:171:21
-5 verbose stack     at ChildProcess.exithandler (child_process.js:194:7)
-5 verbose stack     at emitTwo (events.js:87:13)
-5 verbose stack     at ChildProcess.emit (events.js:172:7)
-5 verbose stack     at maybeClose (internal/child_process.js:817:16)
-5 verbose stack     at Socket.<anonymous> (internal/child_process.js:319:11)
-5 verbose stack     at emitOne (events.js:77:13)
-5 verbose stack     at Socket.emit (events.js:169:7)
-5 verbose stack     at Pipe._onclose (net.js:469:12)
-6 verbose cwd /Users/axdg/Desktop/gulp-use
-7 error Darwin 15.0.0
-8 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "version" "0.0.3"
-9 error node v4.1.0
-10 error npm  v2.14.3
-11 error Git working directory not clean.
-11 error M  README.md
-11 error AD npm-debug.log
-11 error M  test.js
-12 error If you need help, you may report this error at:
-12 error     <https://github.com/npm/npm/issues>
-13 verbose exit [ 1, true ]
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: '/Users/axdg/Desktop/gulp-use',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory /Users/axdg/.npm/gulp-use/0.0.3/package.tgz not in flight; packing
+9 verbose tar pack [ '/Users/axdg/.npm/gulp-use/0.0.3/package.tgz',
+9 verbose tar pack   '/Users/axdg/Desktop/gulp-use' ]
+10 verbose tarball /Users/axdg/.npm/gulp-use/0.0.3/package.tgz
+11 verbose folder /Users/axdg/Desktop/gulp-use
+12 info prepublish gulp-use@0.0.3
+13 verbose addLocalTarball adding from inside cache /Users/axdg/.npm/gulp-use/0.0.3/package.tgz
+14 silly cache afterAdd gulp-use@0.0.3
+15 verbose afterAdd /Users/axdg/.npm/gulp-use/0.0.3/package/package.json not in flight; writing
+16 verbose afterAdd /Users/axdg/.npm/gulp-use/0.0.3/package/package.json written
+17 silly publish { name: 'gulp-use',
+17 silly publish   version: '0.0.3',
+17 silly publish   description: '> Tap into the gulp pipeline and use vanilla functions to for all your esoteric vinyl transformation needs',
+17 silly publish   main: 'index.js',
+17 silly publish   scripts:
+17 silly publish    { lint: './node_modules/eslint/bin/eslint.js *.js || true',
+17 silly publish      test: 'mocha --reporter spec',
+17 silly publish      coveralls: 'istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage' },
+17 silly publish   author: { name: 'axdg', email: 'axdg@dfant.asia' },
+17 silly publish   license: 'MIT',
+17 silly publish   dependencies: { 'gulp-util': '^3.0.7', 'readable-stream': '^2.0.5' },
+17 silly publish   devDependencies:
+17 silly publish    { expect: '^1.13.4',
+17 silly publish      vinyl: '^1.1.0',
+17 silly publish      'babel-eslint': '^4.1.6',
+17 silly publish      coveralls: '^2.11.6',
+17 silly publish      eslint: '^1.10.3',
+17 silly publish      'eslint-config-airbnb': '^3.1.0',
+17 silly publish      istanbul: '^0.4.2',
+17 silly publish      'mocha-lcov-reporter': '^1.0.0' },
+17 silly publish   keywords: [ 'gulpplugin' ],
+17 silly publish   readme: '# gulp-use\n\n> Tap into the gulp pipeline and use vanilla functions to for all your esoteric vinyl transformation needs\n\n[![Build Status](https://travis-ci.org/axdg/gulp-use.svg?branch=master)](https://travis-ci.org/axdg/gulp-use) [![Circle CI](https://circleci.com/gh/axdg/gulp-use/tree/master.svg?style=shield)](https://circleci.com/gh/axdg/gulp-use/tree/master) [![Coverage Status](https://coveralls.io/repos/github/axdg/gulp-use/badge.svg?branch=master)](https://coveralls.io/github/axdg/gulp-use?branch=master)\n\nThere are plenty of [high](https://github.com/search?q=%40sindresorhus+gulp-) [quality](https://github.com/search?utf8=%E2%9C%93&q=%40contra+gulp-&type=Repositories&ref=searchresults) gulp plugins for performing the common file transformations that one might need from their build system. For the less common transformations, or those that are super specific specific to your needs, you can use \'gulp-use\' to tap into the stream and perform file transformations. \n\nThe typical use case for this module is to map over the stream, but it also comes in very handy when you need to implement some sort of assymetric flow in the pipeline. Such as where a single file is split into multiple files, or multiple files (or their properties) are condensed into a single file - take a look at the examples.\n\n## Installation\n\nInstall package with NPM and add it to your development dependencies:\n\n`npm install --save-dev gulp-use`\n\n## Usage\n\n```js\nvar gulp = require(\'gulp\');\nvar use = require(\'gulp-use\');\n\ngulp.task(\'default\', function() {\n  return gulp.src(\'./src/*.js\')\n    .pipe(gulp-use(function(file) {\n      file.contents = Buffer.concat(\n        file.contents, \n        new Buffer(\'//* last build; \' + Date.now() + \'*/\');\n      );\n      return file;\n    }))\n    .pipe(gulp.dest(\'./dist/\'))\n});\n\n```\n\n## API\n\n### use(transform, [flush], [name])\n\n#### transform\n\nType: `function`\n\nA syncronous function that is passed a vinyl file object. As in the example above, the returned value (a vinyl file object) is pushed into the stream. You may also push files into the stream by calling `this.push(file)` for each of them. Since this function will be syncronous, it is ok to `throw` inside it:\n\n```js\ngulp.task(\'throw\', function () {\n  var stream = gulp.src(\'./*.js\')\n    .pipe(use(function (file) {\n      throw new Error(\'uh-oh!\');\n    }, \'thrower\'));\n\n  return stream;\n});\n```\n\nThrown errors are re-emitted as `gutil.PluginError`s from the stream, you can optionally specify the name that the plugin error will using with the `name` parameter.\n\nIf you pass \'null\' as `transform`, a no-op; `function (file) { return file }` will be used in it\'s place.\n\n#### flush\n\nType: `function`\n\nAn optional syncronous function to be invoked when all files have passed through the stream. If you return a vinyl file, it will be pushed onto the stream. As with `transform`, you may push any number of vinyl files using `this.push(file)`.\n\n#### name\n\nType: `string`\n\nThis will be the second or third parameter depending on whether a `flush` function is provided. It is the name that will be used for `gutil.PluginError`s that are emitted from the stream. Where no `name` is specified `gulp-use` will be used instead.\n\n### use.async(transform, [flush])\n\nYou should use this where either `transform` or `flush` must be asyncronous.\n\n#### transform\n\nType: `function`\n\nThe same as the syncronous version, except that it will be passed a second parameter `next`. Which is used to signal the completion of the the operation. Errors should be passed to `next` as the first argument, and optional as file object to push into the stream as a sceond argument:\n\n```js\nvar gulp = require(\'gulp\');\nvar useAsync = require(\'gulp-use\').async;\n\ngulp.task(\'default\', function() {\n  return gulp.src(\'./src/*.js\')\n    .pipe(useAsync(function(file, next) {\n      file.contents = Buffer.concat(\n        file.contents, \n        new Buffer(\'//* last build; \' + Date.now() + \'*/\');\n      );\n\n      // make it asyncronous\n      setTimeout(function() {\n        next(null, file);\n      }, 1000);\n    }))\n    .pipe(gulp.dest(\'./dist/\'))\n});\n```\n\nAs with the syncronous `transform` you can also call `this.push()`.\n\n#### flush\n\nType: `function`\n\nThe same as syncronous version, except that it is passed `done`, which is used to signal completion and may be called with an optional error as the first argument. `this.push()` must be used if you need to push file onto the stream from `flush`.\n\n## Examples\n\nSome random examples of use cases for `gulp-use`:\n\n### Splitting fasta files\n\nThe [fasta](https://en.wikipedia.org/wiki/FASTA_format) file format is the de facto standard for serialization of DNA or protein sequences in bioinformatics. The format is quite simple; each file may contain one or more DNA/protein sequences. Each sequence must be preceded by a \'header\' line which begins with a less-than cahracter \'>\' followed by any number of identifiers, which are typically delimited by a pipe \'|\' character. Since some software packages output multiple sequences per file, whereas other packages require a single sequence per file, it is sometimes necessary to split a single file into several.\n\nThe following gulp task will split a .fasta file containing multiple sequences into multiple files containing one sequence each. The filename for each of the new files is derived from the [gi](http://www.ncbi.nlm.nih.gov/Sitemap/sequenceIDs.html) number in the header for that sequence.\n\n```js\nvar gulp = require(\'gulp\');\nvar use = require(\'gulp-use\');\n\ngulp.task(\'fasta:split\', function () {\n  function split(file) {\n    var self = this;\n    var re = /gi\\|(\\d+)/;\n    var sequences = String(file.contents).split(\'>\');\n    sequences.shift();\n\n    sequences.forEach(function (sequence) {\n      var path = re.exec(sequence)[1] + \'.fasta\';\n      var contents = new Buffer(\'>\' + sequence);\n      self.push(new File({\n        path: path,\n        contents: contents,\n      }));\n    });\n  }\n\n  return gulp.src(\'./fasta/*.fasta\')\n    .pipe(use(split))\n    .pipe(gulp.dest(\'./fasta\'));\n});\n```\n\n### \'Reducing\' vinyl files\n\nLet\'s assume that that you are using gulp as the build tool for a static blog, you might use [gulp-markdown](https://github.com/sindresorhus/gulp-markdown) to render all of your posts into html. If you then wanted to produce a `.json` file that contained an array of all\nposts sorted by time last modified, you could do this:\n\n```js\nvar gulp = require(\'gulp\');\nvar markdown = require(\'gulp-markdown\');\n\ngulp.task(\'build:posts\', function () {\n  var accumulated = [];\n  function transform(file) {\n    accumulated.push({\n      path: file.path,\n      mtime: Date.parse(file.stat.mtime),\n    });\n  }\n\n  function flush() {\n    accumulated.sort(function (a, b) {\n      return b.mtime - a.mtime;\n    });\n\n    var file = new File({\n      path: \'./summary.json\',\n      contents: new Buffer(\n        JSON.stringify(accumulated, false, \'  \')\n      ),\n    });\n    this.push(file);\n  }\n\n  return gulp.src(\'./*.md\')\n    .pipe(markdown())\n    .pipe(gulp.dest(\'./build/\'))\n    .pipe(use(transform, flush))\n    .pipe(gulp.dest(\'./build/json/\'));\n});\n```\n## License\n\nMIT © 2016 axdg (<axdg@dfant.asia>)\n',
+17 silly publish   readmeFilename: 'README.md',
+17 silly publish   gitHead: '8b0c55129bd8978e336ea729c8147f701b19d638',
+17 silly publish   _id: 'gulp-use@0.0.3',
+17 silly publish   _shasum: '9facc9a79d25d952d7ff7185cdae9653be929bee',
+17 silly publish   _from: '.' }
+18 verbose getPublishConfig undefined
+19 silly mapToRegistry name gulp-use
+20 silly mapToRegistry using default registry
+21 silly mapToRegistry registry https://registry.npmjs.org/
+22 silly mapToRegistry uri https://registry.npmjs.org/gulp-use
+23 verbose publish registryBase https://registry.npmjs.org/
+24 silly publish uploading /Users/axdg/.npm/gulp-use/0.0.3/package.tgz
+25 verbose request uri https://registry.npmjs.org/gulp-use
+26 verbose request sending authorization for write operation
+27 info attempt registry request try #1 at 2:57:20 AM
+28 verbose request using bearer token for auth
+29 verbose request id ba22a4ef43f661c0
+30 http request PUT https://registry.npmjs.org/gulp-use
+31 http 403 https://registry.npmjs.org/gulp-use
+32 verbose headers { 'content-type': 'application/json',
+32 verbose headers   'cache-control': 'max-age=300',
+32 verbose headers   'content-length': '95',
+32 verbose headers   'accept-ranges': 'bytes',
+32 verbose headers   date: 'Thu, 28 Jan 2016 15:57:22 GMT',
+32 verbose headers   via: '1.1 varnish',
+32 verbose headers   connection: 'keep-alive',
+32 verbose headers   'x-served-by': 'cache-syd1624-SYD',
+32 verbose headers   'x-cache': 'MISS',
+32 verbose headers   'x-cache-hits': '0',
+32 verbose headers   'x-timer': 'S1453996641.426687,VS0,VE893' }
+33 verbose request invalidating /Users/axdg/.npm/registry.npmjs.org/gulp-use on PUT
+34 error publish Failed PUT 403
+35 verbose stack Error: "You cannot publish over the previously published version 0.0.3." : gulp-use
+35 verbose stack     at makeError (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:263:12)
+35 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:251:14)
+35 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:171:14)
+35 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/request/request.js:198:22)
+35 verbose stack     at emitTwo (events.js:87:13)
+35 verbose stack     at Request.emit (events.js:172:7)
+35 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1073:14)
+35 verbose stack     at emitOne (events.js:82:20)
+35 verbose stack     at Request.emit (events.js:169:7)
+35 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/request/request.js:1019:12)
+36 verbose statusCode 403
+37 verbose pkgid gulp-use
+38 verbose cwd /Users/axdg/Desktop/gulp-use
+39 error Darwin 15.0.0
+40 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "publish"
+41 error node v4.1.0
+42 error npm  v2.14.3
+43 error code E403
+44 error "You cannot publish over the previously published version 0.0.3." : gulp-use
+45 error If you need help, you may report this error at:
+45 error     <https://github.com/npm/npm/issues>
+46 verbose exit [ 1, true ]
