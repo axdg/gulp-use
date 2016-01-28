@@ -36,7 +36,7 @@ gulp.task('default', function() {
 
 ## API
 
-### use(transform [,flush] [,name])
+### use(transform, [flush], [name])
 
 #### transform
 
@@ -71,7 +71,7 @@ Type: `string`
 
 This will be the second or third parameter depending on whether a `flush` function is provided. It is the name that will be used for `gutil.PluginError`s that are emitted from the stream. Where no `name` is specified `gulp-use` will be used instead.
 
-### use.async(transform [,flush])
+### use.async(transform, [flush])
 
 You should use this where either `transform` or `flush` must be asyncronous.
 

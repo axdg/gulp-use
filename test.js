@@ -1,5 +1,3 @@
-'use strict';
-
 var use = require('./');
 var stream = require('readable-stream');
 var File = require('vinyl');
@@ -9,7 +7,7 @@ var expect = require('expect');
  * Some fixture vinyl files
  */
 var files = [];
-for (let i = 0; i < 10; i++) {
+for (var i = 0; i < 10; i++) {
   files.push(new File({
     cwd: '/',
     base: '/test/',
@@ -42,8 +40,8 @@ function producer(arr) {
   input = arr.slice(0);
 
   // clone vinyls so-as not to mutate
-  input.forEach(function (c, i) {
-    input[i] = c.clone();
+  input.forEach(function (file, index) {
+    input[index] = file.clone();
   });
 
   return new stream.Readable({
@@ -154,8 +152,8 @@ describe('use', function () {
       // getting a bit wierd - unreadable
       s.on('finish', function () {
         expect(output.length).toBe(3);
-        output.forEach(function (file, i) {
-          expect(+file.contents).toBe((i + 1) * 3);
+        output.forEach(function (file, index) {
+          expect(+file.contents).toBe((index + 1) * 3);
         });
         complete();
       });
