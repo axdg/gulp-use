@@ -4,9 +4,9 @@
 
 [![Build Status](https://travis-ci.org/axdg/gulp-use.svg?branch=master)](https://travis-ci.org/axdg/gulp-use) [![Circle CI](https://circleci.com/gh/axdg/gulp-use/tree/master.svg?style=shield)](https://circleci.com/gh/axdg/gulp-use/tree/master) [![Coverage Status](https://coveralls.io/repos/github/axdg/gulp-use/badge.svg?branch=master)](https://coveralls.io/github/axdg/gulp-use?branch=master)
 
-There are plenty of [high](https://github.com/search?q=%40sindresorhus+gulp-) [quality](https://github.com/search?utf8=%E2%9C%93&q=%40contra+gulp-&type=Repositories&ref=searchresults) gulp plugins for performing the common file transformations that one might need from their build system. For the less common transformations, or those that are specific to your needs, you can use 'gulp-use' to tap into the stream and perform file transformations. 
+There are plenty of [high](https://github.com/search?q=%40sindresorhus+gulp-) [quality](https://github.com/search?utf8=%E2%9C%93&q=%40contra+gulp-&type=Repositories&ref=searchresults) gulp plugins for performing the common file transformations that one might need from their build system. For the less common transformations, or those that are specific to your needs, you can use `gulp-use` to tap into the stream. 
 
-The typical use case for this module is to map over the stream, but it also comes in very handy when you need to implement some sort of assymetric flow in the pipeline. Such as where a single file is split into multiple files, or multiple files (or their properties) are condensed into a single file - take a look at the examples.
+The typical use case for this module is to map over the stream, but it also comes in very handy when you need to implement some sort of assymetric flow in the pipeline i.e. where a single file is split into multiple files, or multiple files (or their properties) are condensed into a single file - take a look at the examples.
 
 ## Installation
 
@@ -69,7 +69,7 @@ An optional syncronous function to be invoked when all files have passed through
 
 Type: `string`
 
-This will be the second or third parameter depending on whether a `flush` function is provided. It is the name that will be used for `gutil.PluginError`s that are emitted from the stream. Where no `name` is specified `gulp-use` will be used instead.
+This will be the second or third parameter depending on whether a `flush` function is provided. It is the name that will be used for `gutil.PluginError`s that are emitted from the stream. Where no `name` is specified `'gulp-use'` will be used instead.
 
 ### use.async(transform, [flush])
 
@@ -79,7 +79,7 @@ You should use this where either `transform` or `flush` must be asyncronous.
 
 Type: `function`
 
-The same as the syncronous version, except that it will be passed a second parameter `next`. Which is used to signal the completion of the the operation. Errors should be passed to `next` as the first argument, and optional as file object to push into the stream as a sceond argument:
+The same as the syncronous version, except that it will be passed a second parameter `next`,which is used to signal the completion of the the operation. Errors should be passed to `next` as the first argument, which also accepts a file to push into the stream:
 
 ```js
 var gulp = require('gulp');
