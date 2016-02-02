@@ -116,7 +116,7 @@ Some random examples of use cases for `gulp-use`:
 
 ### Splitting fasta files
 
-The [fasta](https://en.wikipedia.org/wiki/FASTA_format) file format is the de facto standard for serialization of DNA or protein sequences in bioinformatics. The format is quite simple; each file may contain one or more DNA/protein sequences. Each sequence must be preceded by a 'header' line which begins with a less-than cahracter '>' followed by any number of identifiers, which are typically delimited by a pipe '|' character. Since some software packages output multiple sequences per file, whereas other packages require a single sequence per file, it is sometimes necessary to split a single file into several.
+The [fasta](https://en.wikipedia.org/wiki/FASTA_format) file format is the de facto standard for serialization of DNA or protein sequences in bioinformatics. The format is quite simple; each file may contain one or more DNA/protein sequences. Each sequence must be preceded by a 'header' line which begins with a less-than character '>' followed by any number of identifiers, which are typically delimited by a pipe '|' character. Since some software packages output multiple sequences per file, whereas other packages require a single sequence per file, it is sometimes necessary to split a single file into several.
 
 The following gulp task will split a .fasta file containing multiple sequences into multiple files containing one sequence each. The filename for each of the new files is derived from the [gi](http://www.ncbi.nlm.nih.gov/Sitemap/sequenceIDs.html) number in the header for that sequence.
 
