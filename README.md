@@ -79,7 +79,7 @@ You should use this where either `transform` or `flush` must be asyncronous.
 
 Type: `function`
 
-The same as the syncronous version, except that it will be passed a second parameter `next`,which is used to signal the completion of the the operation. Errors should be passed to `next` as the first argument, which also accepts a file to push into the stream:
+The same as the syncronous version, except that it will be passed a second parameter `next`, which is used to signal the completion of the the operation. Errors should be passed to `next` as the first argument, which also accepts a file to push into the stream:
 
 ```js
 var gulp = require('gulp');
@@ -102,7 +102,7 @@ gulp.task('default', function() {
 });
 ```
 
-As with the syncronous `transform` you can also call `this.push()`.
+As with the syncronous `transform`, you can also call `this.push()`.
 
 #### flush
 
@@ -149,7 +149,7 @@ gulp.task('fasta:split', function () {
 
 ### 'Reducing' vinyl files
 
-Let's assume that that you are using gulp as the build tool for a static blog, you might use [gulp-markdown](https://github.com/sindresorhus/gulp-markdown) to render all of your posts into html. If you then wanted to produce a `.json` file that contained an array of all
+Let's assume that that you are using gulp as the build tool for a static blog, you might use [gulp-markdown](https://github.com/sindresorhus/gulp-markdown) to render all of your posts to html. If you then wanted to produce a `.json` file that contained an array of all
 posts sorted by time last modified, you could do this:
 
 ```js
